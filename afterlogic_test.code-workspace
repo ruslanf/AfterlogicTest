@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "/Users/black_zerg/VS Code Projects"
+		},
+		{
+			"path": "/Users/black_zerg/VS Code Projects/Flutter"
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/.classpath": true,
+			"**/.project": true,
+			"**/.settings": true,
+			"**/.factorypath": true
+		}
+	}
+}
