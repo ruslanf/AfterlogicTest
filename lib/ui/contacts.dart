@@ -122,6 +122,7 @@ _loadStorages() async {
 }
 
 _loadSubTitle() async {
+  storages = await getContactStorages(global.token);
   subTitle = storages.result.firstWhere((f) => f.id == storageId).name;
 }
 
