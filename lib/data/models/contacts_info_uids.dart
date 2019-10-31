@@ -20,13 +20,15 @@ class UserInfo {
   final String fullName;
   final String skype;
   final String facebook;
-  final String primaryAdress;
-  final String primaryPhone;
+  final int primaryAdress;
+  final int primaryPhone;
+  final String personalAddress;
 
   UserInfo(
       {this.eTag,
       this.fullName,
       this.personalEmail,
+      this.personalAddress,
       this.primaryPhone,
       this.primaryAdress,
       this.skype,
@@ -36,6 +38,7 @@ class UserInfo {
       : eTag = json['ETag'],
         fullName = json['FullName'],
         personalEmail = json['PersonalEmail'],
+        personalAddress = json['PersonalAddress'],
         primaryPhone = json['PrimaryPhone'],
         primaryAdress = json['PrimaryAdress'],
         skype = json['Skype'],

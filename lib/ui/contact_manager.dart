@@ -33,24 +33,10 @@ class _Host extends StatefulWidget {
 
 class __HostState extends State<_Host> {
   final hostController = TextEditingController(text: "test.afterlogic.com");
-  final emailController = TextEditingController();
+  final emailController = TextEditingController(text: "job_applicant@afterlogic.com");
   final passwordController = TextEditingController();
 
-  // Future<String> host;
   Future<bool> saveResult;
-  // Future<LoginResult> loginResult;
-
-  // @override
-  // void initState() {
-  //   host = _getThingsOnStartUp();
-  //   super.initState();
-  // }
-
-  // Future _getThingsOnStartUp() async {
-  //   String host = _getHostFromLocal();
-  //   print("Storages result -> $host");
-  //   return host;
-  // }
 
   @override
   void dispose() {
@@ -118,9 +104,6 @@ class __HostState extends State<_Host> {
                             emailController.text,
                             passwordController.text);
                         String token = loginResult.token.authToken;
-                        print("Token -> $token");
-                        // global.token = token;
-
                         saveResult = LocalStorage().saveHost(hostController.text);
                         
                         Navigator.push(
