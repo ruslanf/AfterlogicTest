@@ -30,6 +30,8 @@ class _ContactsState extends State<Contacts> {
   void initState() {
     print("initState()...");
     global.token = widget.token;
+    storageId = "personal";
+    _loadStorages();
     super.initState();
   }
 
@@ -73,7 +75,8 @@ class _ContactsState extends State<Contacts> {
               onTap: () {
                 setState(() {
                   Navigator.pop(context, true);
-                  _changeList("personal");
+                  storageId = "personal";
+                  _changeList(storageId);
                 });
               }
             ),
@@ -85,7 +88,8 @@ class _ContactsState extends State<Contacts> {
               onTap: () {
                 setState(() {
                   Navigator.pop(context, true);
-                  _changeList("team");
+                  storageId = "team";
+                  _changeList(storageId);
                 });
               }
             ),
@@ -99,29 +103,31 @@ class _ContactsState extends State<Contacts> {
   }
 }
 
-void _changeList(String _id) async {
+_changeList(String _id) async {
   var contactsInfo = await getContactsInfo(global.token, _id);
   List<String> uids = List();
   contactsInfo.result.info.forEach((i) => uids.add(i.uUID));
   var contactsInfoUids = await getContactsInfoUIDS(global.token, _id, uids);
   listContactsInfo = contactsInfoUids.result;
+  subTitle = storages.result.firstWhere((f) => f.id == _id).name;
 }
 
 var subTitle;
 List<UserInfo> listContactsInfo = List();
-_loadSubTitle() async {
-  var _storages = await getContactStorages(global.token);
-  subTitle = _storages.result.last.name;
+Storages storages;
+String storageId;
+_loadStorages() async {
+  storages = await getContactStorages(global.token);
+  _changeList(storageId);
 }
 
-_loadListContacts() async {
-  var _storages = await getContactStorages(global.token);
-  _changeList(_storages.result.last.id);
+_loadSubTitle() async {
+  subTitle = storages.result.firstWhere((f) => f.id == storageId).name;
 }
 
 Widget _futureListLoad(BuildContext context) {
   return FutureBuilder(
-    future: _loadListContacts(),
+    future: _changeList(storageId),
     builder: (context, snapshot) {
       if (snapshot.hasError) print(snapshot.error);
       return (snapshot.connectionState == ConnectionState.done)
