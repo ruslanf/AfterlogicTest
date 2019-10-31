@@ -70,11 +70,27 @@ class _ContactsState extends State<Contacts> {
             ),
             ListTile(
               title: Text("Personal"),
-              onTap: () => _changeList("personal"),
+              onTap: () {
+                setState(() {
+                  Navigator.pop(context, true);
+                  _changeList("personal");
+                });
+              }
+            ),
+            Divider(
+              height: 2.0,
             ),
             ListTile(
               title: Text("Team"),
-              onTap: () => _changeList("team"),
+              onTap: () {
+                setState(() {
+                  Navigator.pop(context, true);
+                  _changeList("team");
+                });
+              }
+            ),
+            Divider(
+              height: 2.0,
             )
           ],
         ),
