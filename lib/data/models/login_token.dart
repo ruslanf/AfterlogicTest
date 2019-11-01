@@ -1,13 +1,15 @@
 class LoginToken {
   final Map result;
   final AuthToken token;
+  final int authenticatedUserId;
 
-  LoginToken({this.result, this.token});
+  LoginToken({this.result, this.token, this.authenticatedUserId});
 
   factory LoginToken.fromJson(Map<String, dynamic> json) {
     return LoginToken(
       result: json['Result'],
       token: AuthToken.fromJson(json['Result']),
+      authenticatedUserId: json['AuthenticatedUserId'],
     );
   }
 }
