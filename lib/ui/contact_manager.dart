@@ -64,16 +64,24 @@ class __HostState extends State<_Host> {
                     style:
                         TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
                 Padding(
-                    padding: EdgeInsets.all(16.0), 
-                    child: _hostLoad(context)
-                ),
+                    padding: EdgeInsets.all(16.0),
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                          hintText: "Without https://", labelText: "Host"),
+                      controller: hostController,
+                    )),
                 Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: _emailLoad(context)
-                ),
+                    padding: EdgeInsets.all(16.0),
+                    child: TextFormField(
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                          hintText: "xxx@afterlogic.com", labelText: "Email"),
+                      controller: emailController,
+                    )),
                 Padding(
                   padding: EdgeInsets.all(16.0),
                   child: TextFormField(
+                    obscureText: true,
                     decoration: InputDecoration(
                         hintText: "Your pass", labelText: "Password"),
                     controller: passwordController,
@@ -99,7 +107,8 @@ class __HostState extends State<_Host> {
                             passwordController.text);
                         String token = loginResult.token.authToken;
                         saveHost = LocalStorage().saveHost(hostController.text);
-                        saveEMail = LocalStorage().saveEMail(emailController.text);
+                        saveEMail =
+                            LocalStorage().saveEMail(emailController.text);
 
                         Navigator.push(
                             context,
@@ -123,17 +132,21 @@ class __HostState extends State<_Host> {
     return _host;
   }
 
+  String eMail = "";
   _getEMailFromLocal() async {
-    var _email = await LocalStorage().getEMail();
-    return _email;
+    eMail = await LocalStorage().getEMail();
+    // return _email;
   }
 
   Widget _hostLoad(BuildContext context) {
     return FutureBuilder(
       future: _getHostFromLocal(),
       builder: (context, snapshot) {
-        hostController.text =
-            (snapshot.data != null) ? snapshot.data : DEFAULT_HOST;
+        // hostController.text =
+        //     (snapshot.data != null) ? snapshot.data : DEFAULT_HOST;
+        if (snapshot.data != null) {
+          hostController.text = snapshot.data;
+        }
         return (snapshot.connectionState == ConnectionState.done)
             ? TextFormField(
                 decoration: InputDecoration(
@@ -151,10 +164,15 @@ class __HostState extends State<_Host> {
     return FutureBuilder(
       future: _getEMailFromLocal(),
       builder: (context, snapshot) {
-        emailController.text =
-            (snapshot.data != null) ? snapshot.data : "";
+        emailController.text = (eMail != "") ? eMail : "";
+        // if (snapshot.data != null || snapshot.data != "") {
+        //   print("Snapshot -> ${snapshot.data}");
+        //   emailController.text = snapshot.data; } else {
+        //     print("is null");
+        //     LocalStorage().saveEMail(emailController.text);}
         return (snapshot.connectionState == ConnectionState.done)
             ? TextFormField(
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                     hintText: "xxx@afterlogic.com", labelText: "Email"),
                 controller: emailController,
