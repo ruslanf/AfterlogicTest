@@ -1,3 +1,4 @@
+import 'package:afterlogic_test/common/constants.dart';
 import 'package:afterlogic_test/data/http/api_client.dart';
 import 'package:afterlogic_test/data/models/login_token.dart';
 import 'package:afterlogic_test/ui/contacts.dart';
@@ -32,11 +33,12 @@ class _Host extends StatefulWidget {
 }
 
 class __HostState extends State<_Host> {
-  final hostController = TextEditingController(text: "test.afterlogic.com");
-  final emailController = TextEditingController(text: "job_applicant@afterlogic.com");
+  final hostController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  Future<bool> saveResult;
+  Future<bool> saveHost;
+  Future<bool> saveEMail;
 
   @override
   void dispose() {
@@ -62,20 +64,12 @@ class __HostState extends State<_Host> {
                     style:
                         TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
                 Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                        hintText: "Without https://", labelText: "Host"),
-                    controller: hostController,
-                  ),
+                    padding: EdgeInsets.all(16.0), 
+                    child: _hostLoad(context)
                 ),
                 Padding(
                   padding: EdgeInsets.all(16.0),
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                        hintText: "xxx@afterlogic.com", labelText: "Email"),
-                    controller: emailController,
-                  ),
+                  child: _emailLoad(context)
                 ),
                 Padding(
                   padding: EdgeInsets.all(16.0),
@@ -104,8 +98,9 @@ class __HostState extends State<_Host> {
                             emailController.text,
                             passwordController.text);
                         String token = loginResult.token.authToken;
-                        saveResult = LocalStorage().saveHost(hostController.text);
-                        
+                        saveHost = LocalStorage().saveHost(hostController.text);
+                        saveEMail = LocalStorage().saveEMail(emailController.text);
+
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -126,5 +121,48 @@ class __HostState extends State<_Host> {
   _getHostFromLocal() async {
     var _host = await LocalStorage().getHost();
     return _host;
+  }
+
+  _getEMailFromLocal() async {
+    var _email = await LocalStorage().getEMail();
+    return _email;
+  }
+
+  Widget _hostLoad(BuildContext context) {
+    return FutureBuilder(
+      future: _getHostFromLocal(),
+      builder: (context, snapshot) {
+        hostController.text =
+            (snapshot.data != null) ? snapshot.data : DEFAULT_HOST;
+        return (snapshot.connectionState == ConnectionState.done)
+            ? TextFormField(
+                decoration: InputDecoration(
+                    hintText: "Without https://", labelText: "Host"),
+                controller: hostController,
+              )
+            : Center(
+                child: CircularProgressIndicator(),
+              );
+      },
+    );
+  }
+
+  Widget _emailLoad(BuildContext context) {
+    return FutureBuilder(
+      future: _getEMailFromLocal(),
+      builder: (context, snapshot) {
+        emailController.text =
+            (snapshot.data != null) ? snapshot.data : "";
+        return (snapshot.connectionState == ConnectionState.done)
+            ? TextFormField(
+                decoration: InputDecoration(
+                    hintText: "xxx@afterlogic.com", labelText: "Email"),
+                controller: emailController,
+              )
+            : Center(
+                child: CircularProgressIndicator(),
+              );
+      },
+    );
   }
 }
