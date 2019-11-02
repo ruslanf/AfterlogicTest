@@ -6,15 +6,14 @@ import 'package:afterlogic_test/data/http/api_contacts_info_uids.dart';
 import 'package:afterlogic_test/data/http/api_contact_storages.dart';
 import 'package:afterlogic_test/data/models/contacts_info.dart';
 import 'package:afterlogic_test/data/models/contacts_info_uids.dart';
+import 'package:afterlogic_test/data/repository/storage_ctag.dart';
+import 'package:afterlogic_test/data/repository/storage_token.dart';
 import 'package:afterlogic_test/ui/view/main_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:afterlogic_test/common/globals.dart' as global;
 import 'package:afterlogic_test/data/models/storages.dart';
 
 class Contacts extends StatefulWidget {
-  final String token;
-
-  Contacts({Key key, @required this.token}) : super(key: key);
+  Contacts({Key key}) : super(key: key);
 
   @override
   _ContactsState createState() => _ContactsState();
@@ -28,8 +27,6 @@ class _ContactsState extends State<Contacts> {
 
   @override
   void initState() {
-    print("initState()...");
-    global.token = widget.token;
     storageId = "personal";
     _loadStorages();
     super.initState();
@@ -103,31 +100,36 @@ class _ContactsState extends State<Contacts> {
   }
 }
 
+ApiContactStorages _apiContactStorages = ApiContactStorages();
+ApiContactsInfo _apiContactsInfo = ApiContactsInfo();
+ApiContactsInfoUids _apiContactsInfoUids = ApiContactsInfoUids();
+StorageToken storageToken = StorageToken();
+StorageCTag storageCTag = StorageCTag();
+
 _changeList(String _id) async {
-  var contactsInfo = await _apiContactsInfo.getContactsInfo(global.token, _id);
+  var contactsInfo = await _apiContactsInfo.getContactsInfo(storageToken.getToken(), _id);
   List<String> uids = List();
   contactsInfo.result.info.forEach((i) => uids.add(i.uUID));
-  var contactsInfoUids = await _apiContactsInfoUids.getContactsInfoUIDS(global.token, _id, uids);
+  var contactsInfoUids = await _apiContactsInfoUids.getContactsInfoUIDS(storageToken.getToken(), _id, uids);
   listContactsInfo = contactsInfoUids.result;
   subTitle = storages.result.firstWhere((f) => f.id == _id).name;
 }
 
-ApiContactStorages _apiContactStorages = ApiContactStorages();
-ApiContactsInfo _apiContactsInfo = ApiContactsInfo();
-ApiContactsInfoUids _apiContactsInfoUids = ApiContactsInfoUids();
+
+
 var subTitle;
 List<UserInfo> listContactsInfo = List();
 Storages storages;
 String storageId;
 _loadStorages() async {
-  storages = await _apiContactStorages.getContactStorages(global.token);
-  storages.result.forEach((f) => (f.id == "team") ? global.tCTag = f.cTag : global.pCTag = f.cTag);
-  print("Personal CTag -> ${global.pCTag}, Team CTag -> ${global.tCTag}");
+  storages = await _apiContactStorages.getContactStorages(storageToken.getToken());
+  storages.result.forEach((f) => (f.id == "team") ? storageCTag.storeTeamCTag(f.cTag) : storageCTag.storePersonalCTag(f.cTag));
+  print("Personal CTag -> ${storageCTag.getPersonalCTag()}, Team CTag -> ${storageCTag.getTeamCtag()}");
   _changeList(storageId);
 }
 
 _loadSubTitle() async {
-  storages = await _apiContactStorages.getContactStorages(global.token);
+  storages = await _apiContactStorages.getContactStorages(storageToken.getToken());
   subTitle = storages.result.firstWhere((f) => f.id == storageId).name;
 }
 

@@ -1,5 +1,6 @@
 import 'package:afterlogic_test/common/constants.dart';
 import 'package:afterlogic_test/data/http/api_login.dart';
+import 'package:afterlogic_test/data/repository/storage_token.dart';
 import 'package:afterlogic_test/ui/contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:afterlogic_test/data/repository/local_storage.dart';
@@ -31,7 +32,8 @@ class _Host extends StatefulWidget {
 
 class __HostState extends State<_Host> {
   final hostController = TextEditingController(text: DEFAULT_HOST);
-  final emailController = TextEditingController(text: "job_applicant@afterlogic.com");
+  final emailController =
+      TextEditingController(text: "job_applicant@afterlogic.com");
   final passwordController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -39,6 +41,7 @@ class __HostState extends State<_Host> {
   Future<bool> saveEMail;
   bool _isProgressBarActive = false;
   ApiLogin apiLogin = ApiLogin();
+  StorageToken storageToken = StorageToken();
 
   @override
   void dispose() {
@@ -135,7 +138,9 @@ class __HostState extends State<_Host> {
                                 });
                               } else {
                                 print("Successful");
-                                String token = loginResult.token.authToken;
+                                storageToken
+                                    .saveToken(loginResult.token.authToken);
+
                                 saveHost = LocalStorage()
                                     .saveHost(hostController.text);
                                 saveEMail = LocalStorage()
@@ -144,8 +149,7 @@ class __HostState extends State<_Host> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            Contacts(token: token)));
+                                        builder: (context) => Contacts()));
                               }
                             },
                             child:
