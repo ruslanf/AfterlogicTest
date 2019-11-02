@@ -22,8 +22,6 @@ class Contacts extends StatefulWidget {
 class _ContactsState extends State<Contacts> {
   Future<Storages> storages;
   Future<ContactsInfo> contactsInfo;
-  String appBarTitle = TITLE_CONTACTS;
-  String appBarSubTitle = "";
 
   @override
   void initState() {
@@ -39,7 +37,7 @@ class _ContactsState extends State<Contacts> {
         title: _futureLoad(context),
         actions: <Widget>[
           IconButton(
-            tooltip: 'Refresh contacts',
+            tooltip: TITLE_REFRESH_BUTTON,
             icon: Icon(Icons.refresh),
             onPressed: () {
               setState(() {
@@ -48,7 +46,7 @@ class _ContactsState extends State<Contacts> {
             },
           ),
           IconButton(
-            tooltip: 'Exit',
+            tooltip: TITLE_EXIT_BUTTON,
             icon: Icon(Icons.exit_to_app),
             onPressed: () => exit(0),
           ),
@@ -62,34 +60,32 @@ class _ContactsState extends State<Contacts> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              child: Text("Contacts type"),
+              child: Text(DRAWER_TITLE),
               decoration: BoxDecoration(
                 color: Colors.green,
               ),
             ),
             ListTile(
-              title: Text("Personal"),
-              onTap: () {
-                setState(() {
-                  Navigator.pop(context, true);
-                  storageId = "personal";
-                  _changeList(storageId);
-                });
-              }
-            ),
+                title: Text(TITLE_PERSONAL),
+                onTap: () {
+                  setState(() {
+                    Navigator.pop(context, true);
+                    storageId = "personal";
+                    _changeList(storageId);
+                  });
+                }),
             Divider(
               height: 2.0,
             ),
             ListTile(
-              title: Text("Team"),
-              onTap: () {
-                setState(() {
-                  Navigator.pop(context, true);
-                  storageId = "team";
-                  _changeList(storageId);
-                });
-              }
-            ),
+                title: Text(TITLE_TEAM),
+                onTap: () {
+                  setState(() {
+                    Navigator.pop(context, true);
+                    storageId = "team";
+                    _changeList(storageId);
+                  });
+                }),
             Divider(
               height: 2.0,
             )
@@ -100,42 +96,71 @@ class _ContactsState extends State<Contacts> {
   }
 }
 
+bool _isFirstRun = true;
 ApiContactStorages _apiContactStorages = ApiContactStorages();
 ApiContactsInfo _apiContactsInfo = ApiContactsInfo();
 ApiContactsInfoUids _apiContactsInfoUids = ApiContactsInfoUids();
-StorageToken storageToken = StorageToken();
-StorageCTag storageCTag = StorageCTag();
-
-_changeList(String _id) async {
-  var contactsInfo = await _apiContactsInfo.getContactsInfo(storageToken.getToken(), _id);
-  List<String> uids = List();
-  contactsInfo.result.info.forEach((i) => uids.add(i.uUID));
-  var contactsInfoUids = await _apiContactsInfoUids.getContactsInfoUIDS(storageToken.getToken(), _id, uids);
-  listContactsInfo = contactsInfoUids.result;
-  subTitle = storages.result.firstWhere((f) => f.id == _id).name;
-}
-
-
+StorageToken _storageToken = StorageToken();
+StorageCTag _storageCTag = StorageCTag();
 
 var subTitle;
 List<UserInfo> listContactsInfo = List();
 Storages storages;
 String storageId;
-_loadStorages() async {
-  storages = await _apiContactStorages.getContactStorages(storageToken.getToken());
-  storages.result.forEach((f) => (f.id == "team") ? storageCTag.storeTeamCTag(f.cTag) : storageCTag.storePersonalCTag(f.cTag));
-  print("Personal CTag -> ${storageCTag.getPersonalCTag()}, Team CTag -> ${storageCTag.getTeamCtag()}");
-  _changeList(storageId);
+
+_changeList(String _id) async {
+  if (_isFirstRun) {
+    _isFirstRun = false;
+    _getContacts(_id);
+  } else {
+    var _pCTag = _storageCTag.getPersonalCTag();
+    var _tCTag = _storageCTag.getTeamCtag();
+    if (!_storageCTag.comparePersonalCTag(_pCTag) ||
+        !_storageCTag.compareTeamCTag(_tCTag)) {
+      _getContacts(storageId);
+    }
+  }
 }
 
-_loadSubTitle() async {
-  storages = await _apiContactStorages.getContactStorages(storageToken.getToken());
-  subTitle = storages.result.firstWhere((f) => f.id == storageId).name;
+_getContacts(String _id) async {
+  var contactsInfo =
+      await _apiContactsInfo.getContactsInfo(_storageToken.getToken(), _id);
+  List<String> uids = List();
+  contactsInfo.result.info.forEach((i) => uids.add(i.uUID));
+  var contactsInfoUids = await _apiContactsInfoUids.getContactsInfoUIDS(
+      _storageToken.getToken(), _id, uids);
+  listContactsInfo = contactsInfoUids.result;
+  subTitle = storages.result.firstWhere((f) => f.id == _id).name;
+}
+
+_loadStorages() async {
+  storages =
+      await _apiContactStorages.getContactStorages(_storageToken.getToken());
+  if (_storageCTag.getPersonalCTag() == 0) {
+    storages.result.forEach((f) =>
+        (f.id == "personal") ? _storageCTag.storePersonalCTag(f.cTag) : null);
+  }
+  if (_storageCTag.getTeamCtag() == 0) {
+    storages.result.forEach(
+        (f) => (f.id == "team") ? _storageCTag.storeTeamCTag(f.cTag) : null);
+  }
+  // if (_isFirstRun) {
+  //   _isFirstRun = false;
+  //   _changeList(storageId);
+  // } else {
+
+  // }
+  var _pCTag = _storageCTag.getPersonalCTag();
+  var _tCTag = _storageCTag.getTeamCtag();
+  if (!_storageCTag.comparePersonalCTag(_pCTag) ||
+      !_storageCTag.compareTeamCTag(_tCTag)) {
+    _changeList(storageId);
+  }
 }
 
 Widget _futureListLoad(BuildContext context) {
   return FutureBuilder(
-    future: _changeList(storageId),
+    future: _loadStorages(),
     builder: (context, snapshot) {
       if (snapshot.hasError) print(snapshot.error);
       return (snapshot.connectionState == ConnectionState.done)
@@ -149,7 +174,7 @@ Widget _futureListLoad(BuildContext context) {
 
 Widget _futureLoad(BuildContext context) {
   return FutureBuilder(
-    future: _loadSubTitle(),
+    future: _changeList(storageId),
     builder: (ctx, snapshot) {
       return (snapshot.connectionState == ConnectionState.done)
           ? Column(

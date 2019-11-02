@@ -6,9 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:afterlogic_test/data/repository/local_storage.dart';
 
 class ContactManager extends StatefulWidget {
-  ContactManager({Key key, this.title}) : super(key: key);
-
-  final String title;
+  ContactManager({Key key}) : super(key: key);
 
   @override
   _ContactManagerState createState() => _ContactManagerState();
@@ -35,13 +33,13 @@ class __HostState extends State<_Host> {
   final emailController =
       TextEditingController(text: "job_applicant@afterlogic.com");
   final passwordController = TextEditingController();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _formKey = GlobalKey<FormState>();
 
-  Future<bool> saveHost;
-  Future<bool> saveEMail;
   bool _isProgressBarActive = false;
   ApiLogin apiLogin = ApiLogin();
-  StorageToken storageToken = StorageToken();
+  final _storageToken = StorageToken();
+  bool _pressedColor = false;
 
   @override
   void dispose() {
@@ -64,100 +62,114 @@ class __HostState extends State<_Host> {
                 padding: const EdgeInsets.all(8.0),
                 color: Colors.grey[350],
                 alignment: Alignment.center,
-                child: Center(
-                  child: Wrap(
-                    alignment: WrapAlignment.center,
-                    children: <Widget>[
-                      Text("Contacts Manager",
-                          style: TextStyle(
-                              fontSize: 32, fontWeight: FontWeight.bold)),
-                      Padding(
+                child: Form(
+                  key: _formKey,
+                  child: Center(
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      children: <Widget>[
+                        Text(LOGIN_PAGE_TITLE,
+                            style: TextStyle(
+                                fontSize: 32, fontWeight: FontWeight.bold)),
+                        Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: TextFormField(
+                              decoration: InputDecoration(
+                                  hintText: HINT_HOST,
+                                  labelText: LABEL_HOST),
+                              validator: (value) =>
+                                  value.isEmpty ? HOST_VALIDATOR : null,
+                              controller: hostController,
+                            )),
+                        Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: TextFormField(
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: InputDecoration(
+                                  hintText: HINT_EMAIL,
+                                  labelText: LABEL_EMAIL),
+                              validator: (value) =>
+                                  value.isEmpty ? EMAIL_VALIDATOR : null,
+                              controller: emailController,
+                            )),
+                        Padding(
                           padding: EdgeInsets.all(16.0),
                           child: TextFormField(
+                            obscureText: true,
                             decoration: InputDecoration(
-                                hintText: "Without https://",
-                                labelText: "Host"),
-                            controller: hostController,
-                          )),
-                      Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: TextFormField(
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                                hintText: "xxx@afterlogic.com",
-                                labelText: "Email"),
-                            controller: emailController,
-                          )),
-                      Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: TextFormField(
-                          obscureText: true,
-                          decoration: InputDecoration(
-                              hintText: "Your pass", labelText: "Password"),
-                          controller: passwordController,
-                        ),
-                      ),
-                      ButtonTheme(
-                        minWidth: MediaQuery.of(context).size.width,
-                        child: Padding(
-                          padding:
-                              EdgeInsets.only(top: 64, left: 16, right: 16),
-                          child: FlatButton(
-                            color: Colors.grey[400],
-                            textColor: Colors.white,
-                            disabledColor: Colors.grey[600],
-                            disabledTextColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
-                                side: BorderSide(color: Colors.grey[400])),
-                            padding: EdgeInsets.all(16),
-                            onPressed: () async {
-                              setState(() {
-                                _isProgressBarActive = true;
-                              });
-
-                              var loginResult = await apiLogin.postLogin(
-                                  hostController.text,
-                                  emailController.text,
-                                  passwordController.text);
-                              if (loginResult.authenticatedUserId == 0) {
-                                print("Error code -> ${loginResult.errorCode}");
-                                _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                  content: Text(
-                                      "Login error -> ${loginResult.errorCode}"),
-                                  duration: Duration(seconds: 10),
-                                  action: SnackBarAction(
-                                      label: "Close",
-                                      onPressed: () {
-                                        _scaffoldKey.currentState
-                                            .hideCurrentSnackBar();
-                                      }),
-                                ));
-                                setState(() {
-                                  _isProgressBarActive = false;
-                                });
-                              } else {
-                                print("Successful");
-                                storageToken
-                                    .saveToken(loginResult.token.authToken);
-
-                                saveHost = LocalStorage()
-                                    .saveHost(hostController.text);
-                                saveEMail = LocalStorage()
-                                    .saveEMail(emailController.text);
-
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Contacts()));
-                              }
-                            },
-                            child:
-                                Text("Login", style: TextStyle(fontSize: 18)),
+                                hintText: HINT_PASSWORD, labelText: LABEL_PASSWORD),
+                            validator: (value) =>
+                                value.isEmpty ? PASSWORD_VALIDATOR : null,
+                            controller: passwordController,
                           ),
                         ),
-                      ),
-                    ],
+                        ButtonTheme(
+                          minWidth: MediaQuery.of(context).size.width,
+                          child: Padding(
+                            padding:
+                                EdgeInsets.only(top: 64, left: 16, right: 16),
+                            child: RaisedButton(
+                              color: _pressedColor
+                                  ? Colors.blue
+                                  : Colors.grey[400],
+                              textColor: Colors.white,
+                              disabledColor: Colors.grey[600],
+                              disabledTextColor: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                  side: BorderSide(color: Colors.grey[400])),
+                              padding: EdgeInsets.all(16),
+                              onPressed: () async {
+                                setState(() {
+                                  _pressedColor = !_pressedColor;
+                                });
+
+                                if (_validateForm()) {
+                                  setState(() {
+                                    _isProgressBarActive = true;
+                                  });
+
+                                  var loginResult = await apiLogin.postLogin(
+                                      hostController.text,
+                                      emailController.text,
+                                      passwordController.text);
+                                  if (loginResult.authenticatedUserId == 0) {
+                                    print("Error code -> ${loginResult.errorCode}");
+                                    _scaffoldKey.currentState
+                                        .showSnackBar(SnackBar(
+                                      content: Text(
+                                          "$SNACKBAR_ERROR_MESSAGE ${loginResult.errorCode}"),
+                                      duration: Duration(seconds: 10),
+                                      action: SnackBarAction(
+                                          label: TITLE_SNACKBAR_CLOSE,
+                                          onPressed: () {
+                                            _scaffoldKey.currentState
+                                                .hideCurrentSnackBar();
+                                          }),
+                                    ));
+                                    setState(() {
+                                      _isProgressBarActive = false;
+                                    });
+                                  } else {
+                                    _storageToken.saveToken(loginResult.token.authToken);
+
+                                    _localStorage.saveHost(hostController.text);
+                                    _localStorage.saveEMail(emailController.text);
+
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => Contacts()));
+                                  }
+                                }
+                              },
+                              child: Text(TITLE_LOGIN_BUTTON,
+                                  style: TextStyle(fontSize: 18)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -165,14 +177,25 @@ class __HostState extends State<_Host> {
     );
   }
 
+  final _localStorage = LocalStorage();
+
+  _validateForm() {
+    final form = _formKey.currentState;
+    if (form.validate()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   _getHostFromLocal() async {
-    var _host = await LocalStorage().getHost();
+    var _host = await _localStorage.getHost();
     return _host;
   }
 
-  String eMail = "";
+  String _eMail = "";
   _getEMailFromLocal() async {
-    eMail = await LocalStorage().getEMail();
+    _eMail = await _localStorage.getEMail();
     // return _email;
   }
 
@@ -188,7 +211,7 @@ class __HostState extends State<_Host> {
         return (snapshot.connectionState == ConnectionState.done)
             ? TextFormField(
                 decoration: InputDecoration(
-                    hintText: "Without https://", labelText: "Host"),
+                    hintText: HINT_HOST, labelText: LABEL_HOST),
                 controller: hostController,
               )
             : Center(
@@ -202,12 +225,12 @@ class __HostState extends State<_Host> {
     return FutureBuilder(
       future: _getEMailFromLocal(),
       builder: (context, snapshot) {
-        emailController.text = (eMail != "") ? eMail : "";
+        emailController.text = (_eMail != "") ? _eMail : "";
         return (snapshot.connectionState == ConnectionState.done)
             ? TextFormField(
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                    hintText: "xxx@afterlogic.com", labelText: "Email"),
+                    hintText: HINT_EMAIL, labelText: LABEL_EMAIL),
                 controller: emailController,
               )
             : Center(

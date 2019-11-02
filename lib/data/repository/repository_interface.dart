@@ -1,3 +1,10 @@
+class LocalStorageInterface {
+  getHost() async {}
+  saveHost(String host) async {}
+  getEMail() async {}
+  saveEMail(String email) async {}
+}
+
 class StorageTokenInterface {
   getToken() {}
   void saveToken(String _token) {}

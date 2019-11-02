@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:afterlogic_test/common/constants.dart';
 import 'package:afterlogic_test/data/models/contacts_info_uids.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,7 @@ class _ContactDetailsState extends State<ContactDetails> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          tooltip: 'Back',
+          tooltip: TITLE_BACK_BUTTON,
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () {
             Navigator.pop(context);
@@ -25,7 +26,7 @@ class _ContactDetailsState extends State<ContactDetails> {
         ),
         actions: <Widget>[
           IconButton(
-            tooltip: 'Exit',
+            tooltip: TITLE_EXIT_BUTTON,
             icon: Icon(Icons.exit_to_app),
             onPressed: () {
               exit(0);

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 void main() => runApp(MainApp());
 
 class MainApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -12,7 +11,7 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: ContactManager(title: 'Contact Manager Page'),
+      home: ContactManager(),
     );
   }
 }
