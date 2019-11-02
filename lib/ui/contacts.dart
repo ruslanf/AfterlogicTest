@@ -104,25 +104,30 @@ class _ContactsState extends State<Contacts> {
 }
 
 _changeList(String _id) async {
-  var contactsInfo = await getContactsInfo(global.token, _id);
+  var contactsInfo = await _apiContactsInfo.getContactsInfo(global.token, _id);
   List<String> uids = List();
   contactsInfo.result.info.forEach((i) => uids.add(i.uUID));
-  var contactsInfoUids = await getContactsInfoUIDS(global.token, _id, uids);
+  var contactsInfoUids = await _apiContactsInfoUids.getContactsInfoUIDS(global.token, _id, uids);
   listContactsInfo = contactsInfoUids.result;
   subTitle = storages.result.firstWhere((f) => f.id == _id).name;
 }
 
+ApiContactStorages _apiContactStorages = ApiContactStorages();
+ApiContactsInfo _apiContactsInfo = ApiContactsInfo();
+ApiContactsInfoUids _apiContactsInfoUids = ApiContactsInfoUids();
 var subTitle;
 List<UserInfo> listContactsInfo = List();
 Storages storages;
 String storageId;
 _loadStorages() async {
-  storages = await getContactStorages(global.token);
+  storages = await _apiContactStorages.getContactStorages(global.token);
+  storages.result.forEach((f) => (f.id == "team") ? global.tCTag = f.cTag : global.pCTag = f.cTag);
+  print("Personal CTag -> ${global.pCTag}, Team CTag -> ${global.tCTag}");
   _changeList(storageId);
 }
 
 _loadSubTitle() async {
-  storages = await getContactStorages(global.token);
+  storages = await _apiContactStorages.getContactStorages(global.token);
   subTitle = storages.result.firstWhere((f) => f.id == storageId).name;
 }
 

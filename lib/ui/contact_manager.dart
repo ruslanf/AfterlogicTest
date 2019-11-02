@@ -31,14 +31,14 @@ class _Host extends StatefulWidget {
 
 class __HostState extends State<_Host> {
   final hostController = TextEditingController(text: DEFAULT_HOST);
-  final emailController =
-      TextEditingController(text: "job_applicant@afterlogic.com");
+  final emailController = TextEditingController(text: "job_applicant@afterlogic.com");
   final passwordController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<bool> saveHost;
   Future<bool> saveEMail;
   bool _isProgressBarActive = false;
+  ApiLogin apiLogin = ApiLogin();
 
   @override
   void dispose() {
@@ -113,7 +113,7 @@ class __HostState extends State<_Host> {
                                 _isProgressBarActive = true;
                               });
 
-                              var loginResult = await postLogin(
+                              var loginResult = await apiLogin.postLogin(
                                   hostController.text,
                                   emailController.text,
                                   passwordController.text);
