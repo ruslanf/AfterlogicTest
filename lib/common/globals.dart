@@ -5,3 +5,4 @@ String apiUrl = "";
 
 int tCTag = 0;
 int pCTag = 0;
+List<String> eTags = List();

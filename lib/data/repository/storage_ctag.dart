@@ -3,11 +3,6 @@ import 'package:afterlogic_test/common/globals.dart' as global;
 
 class StorageCTag implements StorageCTagInterface {
   @override
-  compareCTag(int _newCTag, int _oldCTag) {
-    return (_newCTag == _oldCTag) ? true : false;
-  }
-
-  @override
   getPersonalCTag() {
     return global.pCTag;
   }
@@ -25,5 +20,15 @@ class StorageCTag implements StorageCTagInterface {
   @override
   void storeTeamCTag(int _cTag) {
     global.tCTag = _cTag;
+  }
+
+  @override
+  comparePersonalCTag(int _newCTag) {
+    return (_newCTag == global.pCTag) ? true : false;
+  }
+
+  @override
+  compareTeamCTag(int _newCTag) {
+    return (_newCTag == global.tCTag) ? true : false;
   }
 }

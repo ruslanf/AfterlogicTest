@@ -8,5 +8,12 @@ class StorageCTagInterface {
   void storePersonalCTag(int _cTag) {}
   getTeamCtag() {}
   void storeTeamCTag(int _cTag) {}
-  compareCTag(int _newCTag, int _oldCTag) {}
+  comparePersonalCTag(int _newCTag) {}
+  compareTeamCTag(int _newCTag) {}
+}
+
+class StorageETagInterface {
+  getETagList() {}
+  void storeETagList(String _eTag) {}
+  compareETag(String _eTag) {}
 }
