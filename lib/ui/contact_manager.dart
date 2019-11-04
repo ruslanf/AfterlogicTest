@@ -188,6 +188,8 @@ class __HostState extends State<_Host> {
     }
   }
 
+//TODO Add loading for stored data from SharedPferences
+
   _getHostFromLocal() async {
     var _host = await _localStorage.getHost();
     return _host;

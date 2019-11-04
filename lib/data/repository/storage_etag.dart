@@ -18,4 +18,14 @@ class StorageETag implements StorageETagInterface {
       global.eTags.add(_eTag);
     }
   }
+
+  @override
+  getFromMap(String _key) {
+    return global.mapETag[_key];
+  }
+
+  @override
+  void putIntoMap(String _key, List<String> _uids) {
+    global.mapETag[_key] = _uids;
+  }
 }

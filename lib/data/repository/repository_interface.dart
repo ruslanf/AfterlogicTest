@@ -22,5 +22,15 @@ class StorageCTagInterface {
 class StorageETagInterface {
   getETagList() {}
   void storeETagList(String _eTag) {}
+  getFromMap(String _key) {}
+  void putIntoMap(String _key, List<String> _uids) {}
   compareETag(String _eTag) {}
+}
+
+class StorageUidsInterface {
+  getUids() {}
+  void storeUids(String _uids) {}
+  getFromMap(String _key) {}
+  void putIntoMap(String _key, List<String> _uids) {}
+  compareUids(String _uids) {}
 }
