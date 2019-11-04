@@ -30,9 +30,9 @@ class _Host extends StatefulWidget {
 }
 
 class __HostState extends State<_Host> {
-  final hostController = TextEditingController(text: DEFAULT_HOST);
-  final emailController =
-      TextEditingController(text: "job_applicant@afterlogic.com");
+  final _localStorage = LocalStorage();
+  final hostController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
@@ -41,6 +41,12 @@ class __HostState extends State<_Host> {
   ApiLogin apiLogin = ApiLogin();
   final _storageToken = StorageToken();
   bool _pressedColor = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialValue();
+  }
 
   @override
   void dispose() {
@@ -76,8 +82,7 @@ class __HostState extends State<_Host> {
                             padding: EdgeInsets.all(16.0),
                             child: TextFormField(
                               decoration: InputDecoration(
-                                  hintText: HINT_HOST,
-                                  labelText: LABEL_HOST),
+                                  hintText: HINT_HOST, labelText: LABEL_HOST),
                               validator: (value) =>
                                   value.isEmpty ? HOST_VALIDATOR : null,
                               controller: hostController,
@@ -87,8 +92,7 @@ class __HostState extends State<_Host> {
                             child: TextFormField(
                               keyboardType: TextInputType.emailAddress,
                               decoration: InputDecoration(
-                                  hintText: HINT_EMAIL,
-                                  labelText: LABEL_EMAIL),
+                                  hintText: HINT_EMAIL, labelText: LABEL_EMAIL),
                               validator: (value) =>
                                   value.isEmpty ? EMAIL_VALIDATOR : null,
                               controller: emailController,
@@ -98,7 +102,8 @@ class __HostState extends State<_Host> {
                           child: TextFormField(
                             obscureText: true,
                             decoration: InputDecoration(
-                                hintText: HINT_PASSWORD, labelText: LABEL_PASSWORD),
+                                hintText: HINT_PASSWORD,
+                                labelText: LABEL_PASSWORD),
                             validator: (value) =>
                                 value.isEmpty ? PASSWORD_VALIDATOR : null,
                             controller: passwordController,
@@ -135,11 +140,12 @@ class __HostState extends State<_Host> {
                                       emailController.text,
                                       passwordController.text);
                                   if (loginResult.authenticatedUserId == 0) {
-                                    print("Error code -> ${loginResult.errorCode}");
+                                    print(
+                                        "Error code -> ${loginResult.errorCode}");
                                     _scaffoldKey.currentState
                                         .showSnackBar(SnackBar(
                                       content: Text(
-                                          "$SNACKBAR_ERROR_MESSAGE ${ERROR_CODES[loginResult.errorCode]}"),
+                                          "$SNACKBAR_ERROR_MESSAGE -> ${ERROR_CODES[loginResult.errorCode]}"),
                                       duration: Duration(seconds: 10),
                                       action: SnackBarAction(
                                           label: TITLE_SNACKBAR_CLOSE,
@@ -152,10 +158,12 @@ class __HostState extends State<_Host> {
                                       _isProgressBarActive = false;
                                     });
                                   } else {
-                                    _storageToken.saveToken(loginResult.token.authToken);
+                                    _storageToken
+                                        .saveToken(loginResult.token.authToken);
 
                                     _localStorage.saveHost(hostController.text);
-                                    _localStorage.saveEMail(emailController.text);
+                                    _localStorage
+                                        .saveEMail(emailController.text);
 
                                     Navigator.push(
                                         context,
@@ -178,8 +186,6 @@ class __HostState extends State<_Host> {
     );
   }
 
-  final _localStorage = LocalStorage();
-
   _validateForm() {
     final form = _formKey.currentState;
     if (form.validate()) {
@@ -189,57 +195,18 @@ class __HostState extends State<_Host> {
     }
   }
 
-//TODO Add loading for stored data from SharedPferences
-
   _getHostFromLocal() async {
-    var _host = await _localStorage.getHost();
-    return _host;
+    await _localStorage.getHost().then((_host) => hostController.text = _host);
   }
 
-  String _eMail = "";
   _getEMailFromLocal() async {
-    _eMail = await _localStorage.getEMail();
-    // return _email;
+    await _localStorage
+        .getEMail()
+        .then((_email) => emailController.text = _email);
   }
 
-  Widget _hostLoad(BuildContext context) {
-    return FutureBuilder(
-      future: _getHostFromLocal(),
-      builder: (context, snapshot) {
-        // hostController.text =
-        //     (snapshot.data != null) ? snapshot.data : DEFAULT_HOST;
-        if (snapshot.data != null) {
-          hostController.text = snapshot.data;
-        }
-        return (snapshot.connectionState == ConnectionState.done)
-            ? TextFormField(
-                decoration: InputDecoration(
-                    hintText: HINT_HOST, labelText: LABEL_HOST),
-                controller: hostController,
-              )
-            : Center(
-                child: CircularProgressIndicator(),
-              );
-      },
-    );
-  }
-
-  Widget _emailLoad(BuildContext context) {
-    return FutureBuilder(
-      future: _getEMailFromLocal(),
-      builder: (context, snapshot) {
-        emailController.text = (_eMail != "") ? _eMail : "";
-        return (snapshot.connectionState == ConnectionState.done)
-            ? TextFormField(
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                    hintText: HINT_EMAIL, labelText: LABEL_EMAIL),
-                controller: emailController,
-              )
-            : Center(
-                child: CircularProgressIndicator(),
-              );
-      },
-    );
+  _initialValue() async {
+    await _getHostFromLocal();
+    await _getEMailFromLocal();
   }
 }

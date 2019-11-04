@@ -26,4 +26,4 @@ const TITLE_EXIT_BUTTON = "Exit";
 const TITLE_BACK_BUTTON = "Back";
 const TITLE_LOGIN_BUTTON = "Login";
 const TITLE_SNACKBAR_CLOSE = "Close";
-const SNACKBAR_ERROR_MESSAGE = "Login error ->";
+const SNACKBAR_ERROR_MESSAGE = "Login error";

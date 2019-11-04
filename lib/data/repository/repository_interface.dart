@@ -1,8 +1,8 @@
 class LocalStorageInterface {
-  getHost() async {}
-  saveHost(String host) async {}
-  getEMail() async {}
-  saveEMail(String email) async {}
+  Future getHost() async {}
+  Future saveHost(String host) async {}
+  Future getEMail() async {}
+  Future saveEMail(String email) async {}
 }
 
 class StorageTokenInterface {

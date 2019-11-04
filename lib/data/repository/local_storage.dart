@@ -8,25 +8,29 @@ class LocalStorage implements LocalStorageInterface {
 
   @override
   Future<String> getEMail() async {
-    final SharedPreferences sp = await SharedPreferences.getInstance();
-    return sp.getString(_email) ?? "";
+    return await SharedPreferences.getInstance().then((onValue) {
+      return (onValue != null) ? onValue.getString(_email) : "";
+    });
   }
 
   @override
   Future<String> getHost() async {
-    final SharedPreferences sp = await SharedPreferences.getInstance();
-    return sp.getString(_host) ?? DEFAULT_HOST;
+    return await SharedPreferences.getInstance().then((onValue) {
+      return (onValue != null) ? onValue.getString(_host) : DEFAULT_HOST; 
+    });
   }
 
   @override
   Future<bool> saveEMail(String email) async {
-    final SharedPreferences sp = await SharedPreferences.getInstance();
-    return sp.setString(_email, email);
+    return await SharedPreferences.getInstance().then((onValue) {
+      return onValue.setString(_email, email);
+    });
   }
 
   @override
   Future<bool> saveHost(String host) async {
-    final SharedPreferences sp = await SharedPreferences.getInstance();
-    return sp.setString(_host, host);
+    return await SharedPreferences.getInstance().then((onValue) {
+      return onValue.setString(_host, host);
+    });
   }  
 }
