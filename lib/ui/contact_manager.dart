@@ -1,4 +1,5 @@
 import 'package:afterlogic_test/common/constants.dart';
+import 'package:afterlogic_test/common/error_codes.dart';
 import 'package:afterlogic_test/data/http/api_login.dart';
 import 'package:afterlogic_test/data/repository/storage_token.dart';
 import 'package:afterlogic_test/ui/contacts.dart';
@@ -138,7 +139,7 @@ class __HostState extends State<_Host> {
                                     _scaffoldKey.currentState
                                         .showSnackBar(SnackBar(
                                       content: Text(
-                                          "$SNACKBAR_ERROR_MESSAGE ${loginResult.errorCode}"),
+                                          "$SNACKBAR_ERROR_MESSAGE ${ERROR_CODES[loginResult.errorCode]}"),
                                       duration: Duration(seconds: 10),
                                       action: SnackBarAction(
                                           label: TITLE_SNACKBAR_CLOSE,
