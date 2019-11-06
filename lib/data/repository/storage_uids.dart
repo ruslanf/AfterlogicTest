@@ -26,6 +26,7 @@ class StorageUids implements StorageUidsInterface {
 
   @override
   void putIntoMap(String _key, List<String> _uids) {
+    global.mapUids = Map();
     global.mapUids[_key] = _uids;
   }
 }

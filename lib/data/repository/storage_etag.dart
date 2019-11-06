@@ -26,6 +26,7 @@ class StorageETag implements StorageETagInterface {
 
   @override
   void putIntoMap(String _key, List<String> _uids) {
+    global.mapETag = Map();
     global.mapETag[_key] = _uids;
   }
 }

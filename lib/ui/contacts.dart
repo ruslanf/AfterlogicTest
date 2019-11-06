@@ -11,6 +11,7 @@ import 'package:afterlogic_test/data/repository/storage_etag.dart';
 import 'package:afterlogic_test/data/repository/storage_token.dart';
 import 'package:afterlogic_test/data/repository/storage_uids.dart';
 import 'package:afterlogic_test/ui/view/main_listview.dart';
+import 'package:afterlogic_test/ui/view/title_view.dart';
 import 'package:flutter/material.dart';
 
 const ID_PERSONAL = "personal";
@@ -104,6 +105,7 @@ final _storageToken = StorageToken();
 final _storageCTag = StorageCTag();
 final _storageETag = StorageETag();
 final _storageUids = StorageUids();
+
 var subTitle = "";
 List<UserInfo> _listPersonalContacts = List();
 List<UserInfo> _listTeamContacts = List();
@@ -137,21 +139,21 @@ _getCTagFromServer() async {
           ? _storageCTag.storePersonalCTag(f.cTag)
           : null);
     } else {
-      _pCTag = _storageCTag.getPersonalCTag();
+      _stors.result.forEach((f) => (f.id == ID_PERSONAL) ? _pCTag = f.cTag : null);
     }
     if (_storageCTag.getTeamCtag() == 0) {
       _stors.result.forEach(
           (f) => (f.id == ID_TEAM) ? _storageCTag.storeTeamCTag(f.cTag) : null);
     } else {
-      _tCTag = _storageCTag.getTeamCtag();
+      _stors.result.forEach((f) => (f.id == ID_TEAM) ? _tCTag = f.cTag : null);
     }
     subTitle = _stors.result.firstWhere((f) => f.id == ID_PERSONAL).name;
     if (!_storageCTag.comparePersonalCTag(_pCTag) ||
         !_storageCTag.compareTeamCTag(_tCTag)) {
-      print("CTag changed...");
       _isCTagChanged = true;
+      _storageCTag.storePersonalCTag(_pCTag);
+      _storageCTag.storeTeamCTag(_tCTag);
     } else {
-      print("CTag not changed");
       _isCTagChanged = false;
     }
   });
@@ -229,20 +231,7 @@ Widget _futureLoad(BuildContext context) {
     future: _changeList(_storageId),
     builder: (context, snapshot) {
       return (snapshot.connectionState == ConnectionState.done)
-          ? Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  TITLE_CONTACTS,
-                  style: TextStyle(color: Colors.white, fontSize: 16.0),
-                ),
-                Text(
-                  subTitle,
-                  style: TextStyle(color: Colors.white, fontSize: 14.0),
-                ),
-              ],
-            )
+          ? TitleView(subTitle: subTitle,)
           : Center(
               child: CircularProgressIndicator(),
             );

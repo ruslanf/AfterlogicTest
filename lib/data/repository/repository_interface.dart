@@ -3,6 +3,10 @@ class LocalStorageInterface {
   Future saveHost(String host) async {}
   Future getEMail() async {}
   Future saveEMail(String email) async {}
+  Future getPCTag() async {}
+  Future savePCtag(int pCTag) async {}
+  Future getTCTag() async {}
+  Future saveTCtag(int tCTag) async {}
 }
 
 class StorageTokenInterface {
