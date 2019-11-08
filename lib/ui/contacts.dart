@@ -29,6 +29,7 @@ class _ContactsState extends State<Contacts> {
   void initState() {
     _storageId = ID_PERSONAL;
     super.initState();
+    _startPage();
   }
 
   @override
@@ -111,6 +112,7 @@ List<UserInfo> _listPersonalContacts = List();
 List<UserInfo> _listTeamContacts = List();
 
 List<UserInfo> listContactsInfo = List();
+Future<List<UserInfo>> lUI;
 String _storageId;
 
 _startPage() async {
@@ -121,10 +123,9 @@ _startPage() async {
     await _getContactsInfoUids(
         ID_PERSONAL, _storageUids.getFromMap(ID_PERSONAL));
 
-    await _showListContacts(ID_PERSONAL);
-
     await _getContactsInfoFromServer(ID_TEAM);
     await _getContactsInfoUids(ID_TEAM, _storageUids.getFromMap(ID_TEAM));
+    await _showListContacts(ID_PERSONAL);
   }
 }
 
@@ -206,6 +207,7 @@ _showListContacts(String _id) {
       subTitle = TITLE_TEAM;
       break;
   }
+  return listContactsInfo;
 }
 
 _changeList(String _id) async {
@@ -214,7 +216,7 @@ _changeList(String _id) async {
 
 Widget _futureListLoad(BuildContext context) {
   return FutureBuilder(
-    future: _startPage(),
+    future: lUI,//_startPage(),
     builder: (context, snapshot) {
       if (snapshot.hasError) print(snapshot.error);
       return (snapshot.connectionState == ConnectionState.done)
